@@ -1,68 +1,80 @@
-<<<<<<< HEAD
-# Acadly — Full Backend (Node.js + Express + MySQL)
+# Acadly: Student Academic Companion
 
-Everything now lives on a real server: login, attendance (with the
-yes/no/swap check-in), internal marks, SGPA/CGPA, and the subject-wise
-question bank. Nothing is stored in the browser except the login token.
+An integrated platform for academic management and performance tracking.
 
-## 1. Install prerequisites
-- Node.js (v18 or newer)
-- MySQL Server, running locally (or update `.env` to point at a remote one)
+Students usually juggle separate apps for attendance, timetables, notes, question papers, and SGPA/CGPA calculation. Acadly brings all of these into one dashboard and uses Machine Learning to predict future attendance.
 
-## 2. Set up the database
-```bash
-cp .env.example .env
-```
-Open `.env` and fill in your MySQL username/password and a random `JWT_SECRET`.
+> Mini project, Department of Artificial Intelligence and Data Science, Rajeev Institute of Technology, Hassan (VTU, Belagavi).
 
-```bash
-npm install
-npm run initdb
-```
-This creates the database, all tables, and seeds the 8 subjects.
+## Features
 
-## 3. Start the server
-```bash
-npm start
-```
-You should see: `Acadly server running at http://localhost:3000`
+- Student registration and login
+- Timetable upload (image or document) with OCR-based extraction of subjects, days, and periods
+- Subject-wise attendance tracking and percentage calculation
+- 85% attendance threshold check
+- ML-based future attendance prediction
+- Internal marks entry with automatic total and average
+- Subject-wise storage of textbooks, notes, question papers, assignments, and study materials
+- SGPA and CGPA calculators
+- Centralized dashboard
 
-## 4. Use it
-Open **http://localhost:3000**. Sign up with name, phone, email and password —
-you're automatically assigned the next free roll number (1 to 48; a 49th
-signup is rejected since all slots are full). Everything you do afterwards —
-marking attendance, entering internal marks, setting grades, adding past
-semesters, adding question papers — is saved straight to MySQL.
+Attendance % = (Classes Attended / Total Classes) x 100
 
-## What's in the database
-| Table | Holds |
+## Tech Stack
+
+| Area | Tools |
 |---|---|
-| `users` | name, phone, email, password hash, roll number, required attendance %, notification position |
-| `subjects` | the 8 class subjects (shared by everyone) |
-| `attendance` | held/attended counts per student per subject |
-| `marks` | Internal 1 / Internal 2 per student per subject |
-| `grades` | current-semester grade + credits per student per subject (for SGPA) |
-| `semesters` | past semesters' SGPA + credits per student (for CGPA) |
-| `questions` | previous papers / important questions, subject-wise, shared by the class |
+| Backend | Python, Django |
+| Frontend | HTML, CSS, JavaScript |
+| Database | MySQL |
+| Data and ML | Pandas, NumPy, Scikit-learn |
+| Image processing | OpenCV, OCR |
+| Dev tools | VS Code, Git, GitHub |
 
-## API summary
-- `POST /api/signup`, `POST /api/login`, `GET /api/me`
-- `GET /api/subjects`, `PUT /api/subjects/:id`
-- `GET /api/attendance`, `POST /api/attendance/mark`, `POST /api/attendance/swap`
-- `GET /api/marks`, `PUT /api/marks/:subjectId`
-- `GET /api/grades`, `PUT /api/grades/:subjectId`
-- `GET /api/semesters`, `POST /api/semesters`, `DELETE /api/semesters/:id`
-- `GET /api/questions`, `POST /api/questions`, `DELETE /api/questions/:id`
-- `PUT /api/settings` (required attendance %)
+## Getting Started
 
-All routes except signup/login require `Authorization: Bearer <token>`,
-which the frontend handles automatically after you log in.
+### Prerequisites
+- Python 3.10+
+- MySQL
+- Git
 
-## Note on the hosted preview link
-The Claude artifact link from earlier is a separate, browser-only demo — a
-hosted preview page can't reach a MySQL server on your computer. This project
-is the real one; run it locally as above.
-=======
-# Acadly
-a student-focused platform to manage academics, assignments, and study resources in one place.
->>>>>>> 84c095c5e6b921526d5f0c663f7385aba4825f2e
+### Setup
+
+```bash
+git clone https://github.com/usha45769-blip/Acadly.git
+cd Acadly
+
+python -m venv venv
+venv\Scripts\activate          # Windows
+source venv/bin/activate       # Mac/Linux
+
+pip install -r requirements.txt
+```
+
+Create a `.env` file by copying `.env.example`, then fill in your own values (secret key, database name, user, password). Never commit `.env`.
+
+```bash
+python manage.py migrate
+python manage.py runserver
+```
+
+Open http://127.0.0.1:8000/ in your browser.
+
+
+## Contributing
+
+1. Pull the latest code: `git checkout main` then `git pull origin main`
+2. Create your own branch: `git checkout -b feature/your-feature`
+3. Commit with clear messages, then push: `git push origin feature/your-feature`
+4. Open a Pull Request into `main`
+
+Do not push directly to `main`.
+
+## References
+
+- [Python](https://www.python.org/)
+- [Django](https://www.djangoproject.com/)
+- [Scikit-learn](https://scikit-learn.org/)
+- [Pandas](https://pandas.pydata.org/)
+- [MySQL](https://www.mysql.com/)
+- [OpenCV](https://opencv.org/)
