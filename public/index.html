@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Acadly</title>
+<style>
+:root{--d:#0B3C49;--t:#0F766E;--a:#F59E0B;--l:#F1F7F7;--tx:#1F2D33;--m:#5B6B70;--bad:#B91C1C;--ok:#15803D;
+  box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);}
+*{box-sizing:border-box}
+body{margin:0;font-family:Calibri,Arial,sans-serif;background:var(--l);color:var(--tx);}
+header{background:var(--d);color:#fff;padding:14px 16px;padding-top:calc(14px + env(safe-area-inset-top,0px));position:sticky;top:0;z-index:5;}
+header h1{margin:0;font-size:21px;font-family:Cambria,Georgia,serif;}
+.picker{display:flex;gap:8px;align-items:center;margin-top:8px;flex-wrap:wrap;font-size:12.5px;}
+select,input,button{font-family:inherit;font-size:14px;}
+nav{display:flex;gap:0;background:#0e4a58;overflow-x:auto;position:sticky;top:64px;z-index:4;}
+nav button{background:none;border:none;color:#CFE5E5;padding:10px 14px;font-size:13px;cursor:pointer;white-space:nowrap;border-bottom:3px solid transparent;}
+nav button.active{color:#fff;border-bottom:3px solid var(--a);font-weight:bold;}
+.wrap{max-width:900px;margin:0 auto;padding:14px;}
+.tab{display:none}.tab.active{display:block}
+.card{background:#fff;border-radius:10px;padding:16px;margin:12px 0;box-shadow:0 1px 4px rgba(0,0,0,.08);}
+.card h2{margin:0 0 10px;font-size:17px;font-family:Cambria,Georgia,serif;color:var(--d);}
+.notif{background:linear-gradient(135deg,var(--t),var(--d));color:#fff;}
+.notif h2{color:#fff}
+.btnrow{display:flex;gap:8px;flex-wrap:wrap}
+.btn{border:none;border-radius:7px;padding:9px 15px;cursor:pointer;font-weight:bold;font-size:13px;}
+.btn.yes{background:#22C55E;color:#06280f}
+.btn.no{background:#EF4444;color:#2b0505}
+.btn.swap{background:var(--a);color:#3a2400}
+.swapbox{margin-top:10px;display:none;gap:8px;align-items:center;flex-wrap:wrap}
+table{width:100%;border-collapse:collapse;font-size:13px;}
+th,td{padding:6px 7px;text-align:left;border-bottom:1px solid #E3ECEC;}
+th{background:#EAF3F3;color:var(--d);font-size:12px;}
+input.subj,input.txt{width:100%;border:1px solid #ddd;border-radius:5px;padding:4px 6px;font-size:13px;}
+input.mk,input.sm{width:56px;border:1px solid #ddd;border-radius:5px;padding:4px 6px;text-align:center;}
+.pct{font-weight:bold;padding:2px 7px;border-radius:12px;font-size:12px;}
+.pct.good{background:#DCFCE7;color:var(--ok)}
+.pct.warn{background:#FEF3C7;color:#92400E}
+.pct.bad{background:#FEE2E2;color:var(--bad)}
+.statrow{display:flex;justify-content:space-around;flex-wrap:wrap;margin-top:6px}
+.stat{text-align:center;padding:8px 4px;}
+.stat b{display:block;font-size:24px;color:var(--d);font-family:Cambria,Georgia,serif;}
+.stat span{font-size:11px;color:var(--m);}
+.note{font-size:11.5px;color:var(--m);margin-top:8px;}
+.msg{font-size:13px;color:var(--ok);}
+.qrow{display:flex;gap:6px;margin-bottom:6px;flex-wrap:wrap;align-items:center}
+.qrow select,.qrow input{flex:1;min-width:100px}
+.qlist li{margin-bottom:4px;font-size:13.5px}
+.qlist a{color:var(--t)}
+#loginScreen{position:fixed;inset:0;background:linear-gradient(135deg,var(--d),var(--t));display:flex;align-items:center;justify-content:center;padding:20px;z-index:20;}
+.loginCard{background:#fff;border-radius:12px;padding:26px;width:100%;max-width:360px;box-shadow:0 8px 28px rgba(0,0,0,.25);}
+.loginCard h1{margin:0 0 4px;font-family:Cambria,Georgia,serif;color:var(--d);font-size:26px;text-align:center;}
+.loginCard p.tag{text-align:center;color:var(--m);font-size:12.5px;margin:0 0 18px;}
+.loginCard label{display:block;font-size:12.5px;color:var(--m);margin:10px 0 3px;}
+.loginCard input{width:100%;padding:9px 10px;border:1px solid #ddd;border-radius:7px;font-size:14px;}
+.loginCard .btn{width:100%;margin-top:16px;padding:11px;background:var(--t);color:#fff;font-size:14px;}
+.switchRow{text-align:center;margin-top:14px;font-size:12.5px;color:var(--m);}
+.switchRow a{color:var(--t);cursor:pointer;font-weight:bold;text-decoration:none;}
+.loginErr{color:var(--bad);font-size:12.5px;min-height:16px;margin-top:8px;text-align:center;}
+.logoutBtn{background:none;border:1px solid #CFE5E5;color:#fff;border-radius:6px;padding:4px 10px;font-size:12px;cursor:pointer;}
+#appRoot{display:none;}
+.loading{padding:20px;text-align:center;color:var(--m);font-size:13px;}
+</style>
+</head>
+<body>
+
+<div id="loginScreen">
+  <div class="loginCard">
+    <h1>Acadly</h1>
+    <p class="tag">Student Academic Companion</p>
+
+    <div id="loginForm">
+      <label>Email</label><input id="liEmail" type="email" placeholder="you@college.edu">
+      <label>Password</label><input id="liPass" type="password" placeholder="Password">
+      <button class="btn" onclick="doLogin()">Log In</button>
+      <div class="switchRow">New here? <a onclick="showSignup()">Create an account</a></div>
+    </div>
+
+    <div id="signupForm" style="display:none">
+      <label>Name</label><input id="suName" type="text" placeholder="Full name">
+      <label>Phone number</label><input id="suPhone" type="tel" placeholder="10-digit number">
+      <label>Email</label><input id="suEmail" type="email" placeholder="you@college.edu">
+      <label>Password</label><input id="suPass" type="password" placeholder="Create a password">
+      <button class="btn" onclick="doSignup()">Sign Up</button>
+      <div class="switchRow">Already have an account? <a onclick="showLogin()">Log in</a></div>
+    </div>
+
+    <div class="loginErr" id="loginErr"></div>
+    <div class="note" style="text-align:center">Real login — one of 48 student slots, stored in MySQL.</div>
+  </div>
+</div>
+
+<div id="appRoot">
+<header>
+  <h1>Acadly</h1>
+  <div class="picker">
+    <span id="stuLabel"></span>
+    <span style="flex:1"></span>
+    <span id="whoami" style="color:#CFE5E5"></span>
+    <button class="logoutBtn" onclick="doLogout()">Log out</button>
+  </div>
+</header>
+<nav id="nav"></nav>
+<div class="wrap">
+
+<div class="tab active" id="tab-home">
+  <div class="card notif">
+    <h2>Class Attendance Check</h2>
+    <div class="q" id="notifQ" style="font-size:15px;margin-bottom:10px">Loading...</div>
+    <div class="btnrow">
+      <button class="btn yes" onclick="markAttendance(true)">Yes, attended</button>
+      <button class="btn no" onclick="markAttendance(false)">No, missed</button>
+      <button class="btn swap" onclick="toggleSwap()">Swap class</button>
+    </div>
+    <div class="swapbox" id="swapBox">
+      <label style="color:#fff">Actually attended:</label>
+      <select id="swapSel"></select>
+      <button class="btn yes" onclick="confirmSwap()">Confirm</button>
+    </div>
+    <div class="note" style="color:#CFE5E5">Logs one class for the subject shown, then moves to the next.</div>
+  </div>
+  <div class="card">
+    <h2>Attendance &amp; Eligibility (required: <span id="reqPctLabel">-</span>%)</h2>
+    <table id="attTable"><tr><td class="loading">Loading...</td></tr></table>
+    <div class="note">Tap a subject name to rename it (shared class timetable). Status shows classes still needed, or classes you can miss.</div>
+  </div>
+</div>
+
+<div class="tab" id="tab-marks">
+  <div class="card">
+    <h2>Internal Marks (Internal 1 &amp; 2, out of 20 each)</h2>
+    <table id="markTable"><tr><td class="loading">Loading...</td></tr></table>
+    <div class="statrow" id="markStats"></div>
+  </div>
+</div>
+
+<div class="tab" id="tab-cgpa">
+  <div class="card">
+    <h2>SGPA / CGPA — this semester (8 subjects)</h2>
+    <table id="sgpaTable"><tr><td class="loading">Loading...</td></tr></table>
+    <div class="statrow" id="sgpaStats"></div>
+    <div class="note">Grade points: O=10, A+=9, A=8, B+=7, B=6, C=5, RA=0.</div>
+  </div>
+  <div class="card">
+    <h2>Past Semesters &amp; CGPA</h2>
+    <div class="qrow">
+      <input class="txt" id="semSgpa" type="number" step="0.01" min="0" max="10" placeholder="SGPA e.g. 8.2">
+      <input class="txt" id="semCredits" type="number" min="1" placeholder="Credits e.g. 24">
+      <button class="btn swap" onclick="addSem()">Add semester</button>
+    </div>
+    <table id="semTable"></table>
+    <div class="statrow" id="cgpaStats"></div>
+  </div>
+</div>
+
+<div class="tab" id="tab-qb">
+  <div class="card">
+    <h2>Question Bank (subject-wise, shared with the class)</h2>
+    <div class="qrow">
+      <select id="qSubj"></select>
+      <input class="txt" id="qTitle" placeholder="e.g. 2023 End-Sem Paper">
+      <input class="txt" id="qLink" placeholder="Link (optional)">
+      <button class="btn swap" onclick="addQ()">Add</button>
+    </div>
+    <div id="qLists"></div>
+    <div class="note">Papers stay grouped under their own subject so nothing gets mixed up.</div>
+  </div>
+</div>
+
+<div class="tab" id="tab-settings">
+  <div class="card">
+    <h2>Settings</h2>
+    <div class="picker">
+      <label>Required attendance %:</label>
+      <input type="number" id="reqPctInput" style="width:70px" min="0" max="100">
+      <button class="btn swap" onclick="saveReq()">Save</button>
+      <span class="msg" id="saveMsg"></span>
+    </div>
+    <div class="note">48 student slots, 8 subjects, 2 internals each. Everything here is stored in MySQL on the server, not in this browser.</div>
+  </div>
+</div>
+
+</div>
+</div>
+
+<script>
+const TABS=[['home','Attendance'],['marks','Internal Marks'],['cgpa','SGPA / CGPA'],['qb','Question Bank'],['settings','Settings']];
+let currentUser=null;
+
+// ---- API helper ----
+async function api(path, opts={}){
+  const token=localStorage.getItem('acadly_token');
+  const headers=Object.assign({'Content-Type':'application/json'}, opts.headers||{});
+  if(token) headers['Authorization']='Bearer '+token;
+  const res=await fetch(path, Object.assign({}, opts, {headers}));
+  let data={};
+  try{ data=await res.json(); }catch(e){}
+  if(!res.ok) throw new Error(data.error || 'Request failed.');
+  return data;
+}
+
+// ---- Auth ----
+function showSignup(){ document.getElementById('loginForm').style.display='none'; document.getElementById('signupForm').style.display='block'; setErr(''); }
+function showLogin(){ document.getElementById('signupForm').style.display='none'; document.getElementById('loginForm').style.display='block'; setErr(''); }
+function setErr(t){ document.getElementById('loginErr').textContent=t; }
+
+async function doSignup(){
+  const name=document.getElementById('suName').value.trim();
+  const phone=document.getElementById('suPhone').value.trim();
+  const email=document.getElementById('suEmail').value.trim().toLowerCase();
+  const password=document.getElementById('suPass').value;
+  setErr('');
+  try{
+    const data=await api('/api/signup',{method:'POST',body:JSON.stringify({name,phone,email,password})});
+    localStorage.setItem('acadly_token', data.token);
+    enterApp(data.user);
+  }catch(e){ setErr(e.message || 'Could not reach the server. Is it running?'); }
+}
+async function doLogin(){
+  const email=document.getElementById('liEmail').value.trim().toLowerCase();
+  const password=document.getElementById('liPass').value;
+  setErr('');
+  try{
+    const data=await api('/api/login',{method:'POST',body:JSON.stringify({email,password})});
+    localStorage.setItem('acadly_token', data.token);
+    enterApp(data.user);
+  }catch(e){ setErr(e.message || 'Could not reach the server. Is it running?'); }
+}
+function doLogout(){
+  localStorage.removeItem('acadly_token');
+  document.getElementById('appRoot').style.display='none';
+  document.getElementById('loginScreen').style.display='flex';
+  document.getElementById('liEmail').value=''; document.getElementById('liPass').value='';
+  showLogin();
+}
+function enterApp(user){
+  currentUser=user;
+  document.getElementById('loginScreen').style.display='none';
+  document.getElementById('appRoot').style.display='block';
+  document.getElementById('whoami').textContent=user.name+' · '+user.email;
+  document.getElementById('stuLabel').textContent='Roll No. '+user.roll_no;
+  startApp();
+}
+async function checkSession(){
+  const token=localStorage.getItem('acadly_token');
+  if(!token) return;
+  try{
+    const data=await api('/api/me');
+    enterApp(data.user);
+  }catch(e){ localStorage.removeItem('acadly_token'); }
+}
+
+// ---- Nav ----
+function initNav(){
+  const nav=document.getElementById('nav'); nav.innerHTML='';
+  TABS.forEach(([id,label],i)=>{
+    const b=document.createElement('button'); b.textContent=label; b.id='navbtn-'+id;
+    if(i===0)b.className='active';
+    b.onclick=()=>showTab(id); nav.appendChild(b);
+  });
+}
+function showTab(id){
+  TABS.forEach(([tid])=>{ document.getElementById('tab-'+tid).classList.toggle('active',tid===id);
+    document.getElementById('navbtn-'+tid).classList.toggle('active',tid===id); });
+  if(id==='marks') loadMarks();
+  if(id==='cgpa') loadGrades();
+  if(id==='qb') loadQuestions();
+}
+
+function pctClass(p,req){ if(p>=req) return 'good'; if(p>=req-10) return 'warn'; return 'bad'; }
+
+// ---- Attendance ----
+async function loadAttendance(){
+  const data=await api('/api/attendance');
+  document.getElementById('reqPctLabel').textContent=data.reqPct;
+  document.getElementById('reqPctInput').value=data.reqPct;
+  const req=data.reqPct;
+
+  const cur=data.attendance.find(r=>r.subjectId===data.notifSubjectId) || data.attendance[0];
+  document.getElementById('notifQ').textContent='Did you attend today\'s "'+cur.name+'" class?';
+  const sel=document.getElementById('swapSel'); sel.innerHTML='';
+  data.attendance.forEach(r=>{ if(r.subjectId!==cur.subjectId){const o=document.createElement('option');o.value=r.subjectId;o.textContent=r.name;sel.appendChild(o);} });
+  document.getElementById('swapBox').style.display='none';
+  window._notifSubjectId=cur.subjectId;
+
+  let h='<tr><th>Subject</th><th>Attended</th><th>Held</th><th>%</th><th>Status</th></tr>';
+  data.attendance.forEach(r=>{
+    const held=r.held, att=r.attended;
+    const pct = held? (att/held*100):0;
+    let status;
+    if(held===0){ status='No classes logged yet'; }
+    else if(pct>=req){
+      const m = req>0 ? Math.floor((100*att - req*held)/req) : 0;
+      status = m>0 ? ('Can miss '+m+' more') : 'On track';
+    } else {
+      const denom = 100-req;
+      const x = denom>0 ? Math.ceil((req*held - 100*att)/denom) : 0;
+      status = 'Attend next '+Math.max(x,1)+' in a row';
+    }
+    h += '<tr><td><input class="subj" value="'+r.name+'" onchange="renameSubject('+r.subjectId+',this.value)"></td>'+
+         '<td>'+att+'</td><td>'+held+'</td>'+
+         '<td><span class="pct '+pctClass(pct,req)+'">'+pct.toFixed(0)+'%</span></td>'+
+         '<td style="font-size:12px">'+status+'</td></tr>';
+  });
+  document.getElementById('attTable').innerHTML=h;
+}
+async function renameSubject(id,val){
+  if(!val.trim()) return;
+  await api('/api/subjects/'+id,{method:'PUT',body:JSON.stringify({name:val.trim()})});
+  loadAttendance();
+}
+function toggleSwap(){ const b=document.getElementById('swapBox'); b.style.display = b.style.display==='flex'?'none':'flex'; }
+async function markAttendance(present){
+  await api('/api/attendance/mark',{method:'POST',body:JSON.stringify({subjectId:window._notifSubjectId, present})});
+  loadAttendance();
+}
+async function confirmSwap(){
+  const actualSubjectId=parseInt(document.getElementById('swapSel').value,10);
+  await api('/api/attendance/swap',{method:'POST',body:JSON.stringify({actualSubjectId})});
+  loadAttendance();
+}
+
+// ---- Internal marks ----
+async function loadMarks(){
+  const data=await api('/api/marks');
+  let h='<tr><th>Subject</th><th>Internal 1</th><th>Internal 2</th><th>Total /'+(data.maxMark*2)+'</th><th>Avg %</th></tr>';
+  let sumTot=0,count=0;
+  data.marks.forEach(r=>{
+    const m1=r.internal1, m2=r.internal2; const tot=(Number(m1)||0)+(Number(m2)||0);
+    const avgp=(m1!=null||m2!=null)? (tot/(data.maxMark*2)*100):null;
+    if(avgp!=null){sumTot+=avgp;count++;}
+    h+='<tr><td>'+r.name+'</td>'+
+       '<td><input class="mk" type="number" min="0" max="'+data.maxMark+'" value="'+(m1!=null?m1:'')+'" onchange="setMark('+r.subject_id+','+data.maxMark+',this)"></td>'+
+       '<td><input class="mk" type="number" min="0" max="'+data.maxMark+'" value="'+(m2!=null?m2:'')+'" onchange="setMark('+r.subject_id+','+data.maxMark+',this,true)"></td>'+
+       '<td>'+tot+'</td><td>'+(avgp!=null?avgp.toFixed(1)+'%':'-')+'</td></tr>';
+  });
+  document.getElementById('markTable').innerHTML=h;
+  const overall=count?(sumTot/count):0;
+  document.getElementById('markStats').innerHTML =
+    '<div class="stat"><b>'+overall.toFixed(1)+'%</b><span>Overall internal avg</span></div>'+
+    '<div class="stat"><b>'+count+'/8</b><span>Subjects entered</span></div>';
+}
+async function setMark(subjectId,maxMark,inputEl,isSecond){
+  const row=inputEl.closest('tr');
+  const inputs=row.querySelectorAll('input.mk');
+  const internal1=inputs[0].value===''?null:inputs[0].value;
+  const internal2=inputs[1].value===''?null:inputs[1].value;
+  await api('/api/marks/'+subjectId,{method:'PUT',body:JSON.stringify({internal1,internal2})});
+  loadMarks();
+}
+
+// ---- SGPA / CGPA ----
+async function loadGrades(){
+  const data=await api('/api/grades');
+  let h='<tr><th>Subject</th><th>Credits</th><th>Grade</th><th>Points</th></tr>';
+  let wsum=0,csum=0;
+  data.grades.forEach(r=>{
+    wsum+=data.gradePoints[r.grade]*r.credits; csum+=r.credits;
+    let opts=Object.keys(data.gradePoints).map(k=>'<option value="'+k+'"'+(k===r.grade?' selected':'')+'>'+k+'</option>').join('');
+    h+='<tr><td>'+r.name+'</td>'+
+       '<td><input class="sm" type="number" min="1" max="10" value="'+r.credits+'" onchange="setGrade('+r.subject_id+',this)"></td>'+
+       '<td><select onchange="setGrade('+r.subject_id+',this)">'+opts+'</select></td>'+
+       '<td>'+data.gradePoints[r.grade]+'</td></tr>';
+  });
+  document.getElementById('sgpaTable').innerHTML=h;
+  const sgpa=csum?(wsum/csum):0;
+  document.getElementById('sgpaStats').innerHTML='<div class="stat"><b>'+sgpa.toFixed(2)+'</b><span>This semester SGPA</span></div><div class="stat"><b>'+csum+'</b><span>Total credits</span></div>';
+  window._curSgpa=sgpa; window._curCredits=csum;
+  loadSemesters();
+}
+async function setGrade(subjectId,el){
+  const row=el.closest('tr');
+  const credits=row.querySelector('input.sm').value;
+  const grade=row.querySelector('select').value;
+  await api('/api/grades/'+subjectId,{method:'PUT',body:JSON.stringify({grade,credits})});
+  loadGrades();
+}
+
+async function loadSemesters(){
+  const data=await api('/api/semesters');
+  let h='<tr><th>Semester</th><th>SGPA</th><th>Credits</th><th></th></tr>';
+  let wsum=0,csum=0;
+  data.semesters.forEach((s,i)=>{ wsum+=s.sgpa*s.credits; csum+=s.credits;
+    h+='<tr><td>Past '+(i+1)+'</td><td>'+Number(s.sgpa).toFixed(2)+'</td><td>'+s.credits+'</td><td><button class="btn no" onclick="removeSem('+s.id+')">x</button></td></tr>'; });
+  const curSgpa=window._curSgpa||0, curCr=window._curCredits||0;
+  h+='<tr><td><b>Current</b></td><td>'+curSgpa.toFixed(2)+'</td><td>'+curCr+'</td><td></td></tr>';
+  document.getElementById('semTable').innerHTML=h;
+  wsum+=curSgpa*curCr; csum+=curCr;
+  const cgpa=csum?(wsum/csum):0;
+  document.getElementById('cgpaStats').innerHTML='<div class="stat"><b>'+cgpa.toFixed(2)+'</b><span>CGPA (incl. current sem)</span></div>';
+}
+async function addSem(){
+  const sgpa=parseFloat(document.getElementById('semSgpa').value);
+  const credits=parseInt(document.getElementById('semCredits').value,10);
+  if(isNaN(sgpa)||isNaN(credits)) return;
+  await api('/api/semesters',{method:'POST',body:JSON.stringify({sgpa,credits})});
+  document.getElementById('semSgpa').value=''; document.getElementById('semCredits').value='';
+  loadSemesters();
+}
+async function removeSem(id){ await api('/api/semesters/'+id,{method:'DELETE'}); loadSemesters(); }
+
+// ---- Question bank ----
+async function loadQuestions(){
+  const data=await api('/api/questions');
+  const sel=document.getElementById('qSubj'); sel.innerHTML='';
+  data.subjects.forEach(s=>{const o=document.createElement('option');o.value=s.id;o.textContent=s.name;sel.appendChild(o);});
+  let h='';
+  data.subjects.forEach(s=>{
+    const qs=data.questions.filter(q=>q.subject_id===s.id);
+    h+='<h3 style="font-size:14px;color:var(--d);margin:10px 0 4px">'+s.name+'</h3><ul class="qlist">';
+    if(!qs.length) h+='<li style="color:var(--m)">No papers added yet.</li>';
+    qs.forEach(q=>{
+      h+='<li>'+q.title+(q.link?' — <a href="'+q.link+'" target="_blank" rel="noopener">link</a>':'')+
+         ' <button class="btn no" style="padding:2px 8px;font-size:11px" onclick="removeQ('+q.id+')">x</button></li>';
+    });
+    h+='</ul>';
+  });
+  document.getElementById('qLists').innerHTML=h;
+}
+async function addQ(){
+  const subjectId=parseInt(document.getElementById('qSubj').value,10);
+  const title=document.getElementById('qTitle').value.trim();
+  const link=document.getElementById('qLink').value.trim();
+  if(!title) return;
+  await api('/api/questions',{method:'POST',body:JSON.stringify({subjectId,title,link})});
+  document.getElementById('qTitle').value=''; document.getElementById('qLink').value='';
+  loadQuestions();
+}
+async function removeQ(id){ await api('/api/questions/'+id,{method:'DELETE'}); loadQuestions(); }
+
+// ---- Settings ----
+async function saveReq(){
+  const v=parseInt(document.getElementById('reqPctInput').value,10);
+  if(isNaN(v)||v<0||v>100) return;
+  await api('/api/settings',{method:'PUT',body:JSON.stringify({reqPct:v})});
+  const msg=document.getElementById('saveMsg'); msg.textContent='Saved.'; setTimeout(()=>msg.textContent='',1500);
+  loadAttendance();
+}
+
+async function startApp(){
+  try{ initNav(); await loadAttendance(); }
+  catch(e){ document.getElementById('appRoot').innerHTML='<p style="padding:20px">Could not load data from the server. Please refresh.</p>'; }
+}
+
+checkSession();
+</script>
+</body>
+</html>
