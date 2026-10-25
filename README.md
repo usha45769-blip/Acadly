@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # Acadly — Full Backend (Node.js + Express + MySQL)
 
 Everything now lives on a real server: login, attendance (with the
@@ -61,3 +62,7 @@ which the frontend handles automatically after you log in.
 The Claude artifact link from earlier is a separate, browser-only demo — a
 hosted preview page can't reach a MySQL server on your computer. This project
 is the real one; run it locally as above.
+=======
+# Acadly
+a student-focused platform to manage academics, assignments, and study resources in one place.
+>>>>>>> 84c095c5e6b921526d5f0c663f7385aba4825f2e
