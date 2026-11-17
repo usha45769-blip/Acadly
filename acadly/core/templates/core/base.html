@@ -1,0 +1,21 @@
+{% load static %}<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>{% block title %}Acadly{% endblock %}</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@500;700&family=Public+Sans:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{% static 'core/style.css' %}"></head>
+<body>{% if user.is_authenticated %}
+<div class="shell"><nav class="side" aria-label="Main">
+<div class="brand">Acadly</div>
+{% url 'dashboard' as u1 %}{% url 'timetable' as u2 %}{% url 'attendance_history' as u3 %}{% url 'marks' as u4 %}{% url 'gpa' as u5 %}{% url 'resources' as u6 %}
+<a href="{{u1}}" {% if request.path == u1 %}class="on"{% endif %}>Dashboard</a>
+<a href="{{u2}}" {% if '/timetable/' in request.path %}class="on"{% endif %}>Timetable</a>
+<a href="{{u3}}" {% if '/attendance/' in request.path %}class="on"{% endif %}>Attendance log</a>
+<a href="{{u4}}" {% if request.path == u4 %}class="on"{% endif %}>Internal marks</a>
+<a href="{{u5}}" {% if '/gpa/' in request.path %}class="on"{% endif %}>SGPA and CGPA</a>
+<a href="{{u6}}" {% if '/resources/' in request.path %}class="on"{% endif %}>Study library</a>
+<form method="post" action="{% url 'logout' %}">{% csrf_token %}<button class="plain" type="submit">Log out</button></form>
+</nav><main>{% else %}<main class="auth">{% endif %}
+{% if messages %}<ul class="msgs" role="status">{% for m in messages %}<li class="{{ m.tags }}">{{ m }}</li>{% endfor %}</ul>{% endif %}
+{% block content %}{% endblock %}
+</main>{% if user.is_authenticated %}</div>{% endif %}</body></html>

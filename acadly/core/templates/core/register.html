@@ -1,0 +1,7 @@
+{% extends "core/base.html" %}{% block title %}Create account - Acadly{% endblock %}
+{% block content %}<h1>Create your account</h1>
+<form method="post" class="card" novalidate>{% csrf_token %}{{ form.non_field_errors }}
+{% for f in form %}<label for="{{ f.id_for_label }}">{{ f.label }}</label>{{ f }}
+{% if f.help_text %}<div class="muted small">{{ f.help_text }}</div>{% endif %}{{ f.errors }}{% endfor %}
+<p><button type="submit">Create account</button></p></form>
+<p class="muted">Already registered? <a href="{% url 'login' %}">Log in</a></p>{% endblock %}

@@ -1,0 +1,12 @@
+{% extends "core/base.html" %}{% block title %}Attendance log - Acadly{% endblock %}
+{% block content %}<h1>Attendance log</h1>
+<form method="post" action="{% url 'attendance_manual' %}" class="card row">{% csrf_token %}
+<select name="subject" aria-label="Subject">{% for s in subjects %}<option value="{{ s.id }}">{{ s.short }}</option>{% endfor %}</select>
+<input type="date" name="date" min="{{ start|date:'Y-m-d' }}" max="{{ today|date:'Y-m-d' }}" value="{{ today|date:'Y-m-d' }}" required aria-label="Date">
+<select name="present" aria-label="Status"><option value="1">Present</option><option value="0">Absent</option></select>
+<button type="submit">Log class</button></form>
+<div class="card scroll"><table><tr><th>Date</th><th>Subject</th><th>Status</th><th></th></tr>
+{% for r in records %}<tr><td>{{ r.date|date:"D j M" }}</td><td>{{ r.subject.short }}</td>
+<td><span class="tag {% if r.present %}p{% else %}a{% endif %}">{% if r.present %}Present{% else %}Absent{% endif %}</span></td>
+<td><form method="post" action="{% url 'attendance_delete' r.id %}">{% csrf_token %}<button class="danger" type="submit">Remove</button></form></td></tr>
+{% empty %}<tr><td colspan="4" class="muted">Nothing logged yet. Mark today's classes on the dashboard.</td></tr>{% endfor %}</table></div>{% endblock %}
