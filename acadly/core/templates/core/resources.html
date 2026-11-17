@@ -1,0 +1,11 @@
+{% extends "core/base.html" %}{% block title %}Study library - Acadly{% endblock %}
+{% block content %}<h1>Study library</h1>
+<form method="get" class="row card"><select name="subject" aria-label="Subject"><option value="">All subjects</option>{% for s in subjects %}<option value="{{ s.id }}" {% if sel_subject == s.id|stringformat:"s" %}selected{% endif %}>{{ s.short }}</option>{% endfor %}</select>
+<select name="category" aria-label="Type"><option value="">All types</option>{% for v,l in categories %}<option value="{{ v }}" {% if sel_cat == v %}selected{% endif %}>{{ l }}</option>{% endfor %}</select><button type="submit">Filter</button></form>
+{% for subject, cats in grouped.items %}<section class="card"><h2>{{ subject.name }}</h2>
+{% for cat, items in cats.items %}<h3 class="muted small">{{ cat }}</h3>
+{% for r in items %}<div class="slot"><span>{% if r.file %}<a href="{{ r.file.url }}">{{ r.title }}</a>{% else %}<a href="{{ r.link }}" rel="noopener noreferrer">{{ r.title }}</a>{% endif %}
+<span class="muted small">added by {{ r.uploaded_by.first_name|default:"a classmate" }}</span></span>
+<form method="post" action="{% url 'resource_delete' r.id %}">{% csrf_token %}<button class="danger" type="submit">Remove</button></form></div>{% endfor %}{% endfor %}</section>
+{% empty %}<p class="muted">Nothing here yet. Add the first item below.</p>{% endfor %}
+<form method="post" enctype="multipart/form-data" class="card"><h2>Add material</h2>{% csrf_token %}{{ form.as_p }}<button type="submit">Add to library</button></form>{% endblock %}

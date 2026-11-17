@@ -1,0 +1,7 @@
+{% extends "core/base.html" %}{% block title %}Timetable - Acadly{% endblock %}
+{% block content %}<h1>Timetable</h1>
+<p class="muted">5th semester, 07 Sep to 30 Dec 2026. Batch labs show both batches.</p>
+{% if user.is_staff %}<p class="row"><a class="btn" href="{% url 'timetable_upload' %}">Upload new timetable</a><a class="btn ghost" href="{% url 'timetable_review' %}">Edit grid</a></p>{% endif %}
+<div class="card scroll"><table class="tt"><tr><th>Day</th>{% for h in heads %}<th>{% if h.brk %}Break{% else %}{{ h.label }}{% endif %}</th>{% endfor %}</tr>
+{% for r in rows %}<tr><th>{{ r.name|slice:":3" }}</th>{% for c in r.cells %}<td colspan="{{ c.span }}" class="{% if c.filled %}f{% elif c.brk %}brk{% endif %}">{{ c.text }}</td>{% endfor %}</tr>
+{% empty %}{% endfor %}</table></div>{% endblock %}

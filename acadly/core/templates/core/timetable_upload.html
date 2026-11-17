@@ -1,0 +1,5 @@
+{% extends "core/base.html" %}{% block title %}Upload timetable - Acadly{% endblock %}
+{% block content %}<h1>Upload timetable</h1>
+<p class="muted">Use a straight, well-lit photo or scan. Acadly reads the table with OCR and shows you a grid to check before anything is saved.</p>
+<form method="post" enctype="multipart/form-data" class="card">{% csrf_token %}{{ form.as_p }}<button type="submit">Read timetable</button></form>
+<p><a href="{% url 'timetable_review' %}">Skip the photo and edit the grid by hand</a></p>{% endblock %}

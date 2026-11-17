@@ -1,0 +1,31 @@
+{% extends "core/base.html" %}{% block title %}Dashboard - Acadly{% endblock %}
+{% block content %}
+<h1>Hi {{ user.first_name|default:user.username }}</h1>
+<p class="muted">Roll no {{ student.roll_no|default:"-" }}, batch {{ student.batch }}. Minimum attendance is {{ threshold }}%.</p>
+{% if needs_setup %}<div class="card"><h2>Start with your attendance so far</h2>
+<p>Enter how many classes were held and how many you attended in each subject up to today. After that, mark each day's classes here.</p>
+<a class="btn" href="{% url 'attendance_base' %}">Enter attendance totals</a></div>{% endif %}
+{% if low %}<div class="card" role="alert"><strong>Below {{ threshold }}% in {{ low|length }} subject{{ low|length|pluralize }}:</strong>
+{% for x in low %}{{ x.subject.short }}{% if not forloop.last %}, {% endif %}{% endfor %}.</div>{% endif %}
+<div class="cols"><section class="card"><h2>Subjects</h2>
+{% for x in summary %}{% with s=x.stats p=x.pred %}
+<div class="subj {{ s.status|cut:'-' }}"><div><strong>{{ x.subject.name }}</strong> <span class="muted small">{{ x.subject.short }}</span>
+<div class="ruler" role="img" aria-label="{{ s.pct }} percent, minimum {{ threshold }} percent"><div class="fill" style="width:{{ s.pct }}%"></div><div class="tick" style="left:{{ threshold }}%"></div></div>
+<div class="small muted">{{ s.attended }} of {{ s.held }} classes
+{% if s.status == 'short' %}- attend the next {{ s.need_to_attend }} in a row to reach {{ threshold }}%
+{% elif s.held %}- you can miss {{ s.can_miss }} more and stay above {{ threshold }}%{% endif %}</div>
+{% if p %}<div class="small">{% if p.will_meet %}On track to finish near <strong>{{ p.projected_pct }}%</strong>.{% else %}Predicted to finish at <strong>{{ p.projected_pct }}%</strong>
+{% if p.reachable %}- attend {{ p.must_attend }} of the remaining {{ p.remaining_classes }} to reach {{ threshold }}%.{% else %}- {{ threshold }}% can no longer be reached by attending alone.{% endif %}{% endif %}
+<span class="muted">({{ p.model }})</span></div>{% endif %}</div>
+<div class="pct">{% if s.held %}{{ s.pct|floatformat:0 }}%{% else %}-{% endif %}</div></div>
+{% endwith %}{% empty %}<p>No subjects yet. Run <code>python manage.py load_5th_sem</code>.</p>{% endfor %}</section>
+<aside><section class="card"><h2>Today, {{ today|date:"l j M" }}</h2>
+{% for sl in today_slots %}<div class="slot"><div><strong>{{ sl.subject.short }}</strong><div class="muted small">{{ sl.start_time }} to {{ sl.end_time }}{% if sl.batch %}, {{ sl.batch }}{% endif %}</div></div>
+<form method="post" action="{% url 'attendance_mark' %}" class="row">{% csrf_token %}<input type="hidden" name="slot" value="{{ sl.id }}">
+{% if sl.mark == True %}<span class="tag p">Present</span>{% elif sl.mark == False %}<span class="tag a">Absent</span>{% endif %}
+<button name="present" value="1" class="{% if sl.mark != True %}ghost{% endif %}">Present</button>
+<button name="present" value="0" class="ghost">Absent</button></form></div>
+{% empty %}<p class="muted">No tracked classes today.</p>{% endfor %}
+<p class="small"><a href="{% url 'attendance_history' %}">Log a different day or an extra class</a></p></section>
+<section class="card small"><a href="{% url 'attendance_base' %}">Edit starting totals</a></section></aside></div>
+{% endblock %}

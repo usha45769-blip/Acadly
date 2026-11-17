@@ -1,0 +1,8 @@
+{% extends "core/base.html" %}{% block title %}Internal marks - Acadly{% endblock %}
+{% block content %}<h1>Internal marks</h1><p class="muted">Each internal is out of 20. Total and average update when you save.</p>
+<form method="post" class="card scroll">{% csrf_token %}<table><tr><th>Subject</th><th>Internal 1</th><th>Internal 2</th><th>Total (40)</th><th>Average</th></tr>
+{% for r in rows %}<tr><td>{{ r.subject.name }}</td>
+<td><input type="number" step="0.5" min="0" max="20" name="i1_{{ r.subject.id }}" value="{{ r.i1|default_if_none:'' }}" aria-label="Internal 1, {{ r.subject.short }}"></td>
+<td><input type="number" step="0.5" min="0" max="20" name="i2_{{ r.subject.id }}" value="{{ r.i2|default_if_none:'' }}" aria-label="Internal 2, {{ r.subject.short }}"></td>
+<td>{{ r.total|default_if_none:"-" }}</td><td>{{ r.avg|default_if_none:"-" }}</td></tr>{% endfor %}</table>
+<p><button type="submit">Save marks</button></p></form>{% endblock %}

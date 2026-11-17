@@ -1,0 +1,8 @@
+{% extends "core/base.html" %}{% block title %}Attendance totals - Acadly{% endblock %}
+{% block content %}<h1>Attendance so far</h1>
+<p class="muted">Classes held and attended in each subject before you began marking in Acadly. Later classes are added on top of these.</p>
+<form method="post" class="card scroll">{% csrf_token %}<table><tr><th>Subject</th><th>Held</th><th>Attended</th></tr>
+{% for r in rows %}<tr><td>{{ r.subject.name }}</td>
+<td><input type="number" min="0" name="held_{{ r.subject.id }}" value="{{ r.base.held|default:0 }}" aria-label="Held in {{ r.subject.short }}"></td>
+<td><input type="number" min="0" name="att_{{ r.subject.id }}" value="{{ r.base.attended|default:0 }}" aria-label="Attended in {{ r.subject.short }}"></td></tr>{% endfor %}</table>
+<p><button type="submit">Save totals</button></p></form>{% endblock %}
